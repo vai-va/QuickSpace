@@ -120,3 +120,31 @@ func GetSpacesByUserIDByEventType(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(spaces)
 }
+
+func PutSpaceByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	if _, err := uuid.Parse(id); err != nil {
+		http.Error(w, "Invalid id", http.StatusBadRequest)
+		return
+	}
+
+	var space models.Space
+	if err := json.NewDecoder(r.Body).Decode(&space); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := space.Validate(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := database.UpdateSpaceByID(id, space); err != nil {
+		log.Errorf("Failed to update space: %v", err)
+		http.Error(w, "Failed to update space", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}

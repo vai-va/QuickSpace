@@ -11,18 +11,21 @@ func RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/api/user", middleware.Logging(handlers.CreateUser)).Methods("POST")
 	router.HandleFunc("/api/users", middleware.Logging(handlers.GetUsers)).Methods("GET")
 	router.HandleFunc("/api/user/{id}", middleware.Logging(handlers.GetUserByID)).Methods("GET")
+	router.HandleFunc("/api/user/{id}", middleware.Logging(handlers.PutUserByID)).Methods("PUT")
 	router.HandleFunc("/api/user/{id}", middleware.Logging(handlers.DeleteUser)).Methods("DELETE")
 	router.HandleFunc("/api/user/{user_id}/space_reservations", middleware.Logging(handlers.GetSpaceReservationsByRentedById)).Methods("GET")
 
 	router.HandleFunc("/api/space", middleware.Logging(handlers.CreateSpace)).Methods("POST")
 	router.HandleFunc("/api/spaces", middleware.Logging(handlers.GetSpaces)).Methods("GET")
 	router.HandleFunc("/api/space/{id}", middleware.Logging(handlers.GetSpaceByID)).Methods("GET")
+	router.HandleFunc("/api/space/{id}", middleware.Logging(handlers.PutSpaceByID)).Methods("PUT")
 	router.HandleFunc("/api/space/{id}", middleware.Logging(handlers.DeleteSpace)).Methods("DELETE")
 	router.HandleFunc("/api/space/{space_id}/ratings", middleware.Logging(handlers.GetSpaceRatingsBySpaceID)).Methods("GET")
 
 	router.HandleFunc("/api/event_type", middleware.Logging(handlers.CreateEventType)).Methods("POST")
 	router.HandleFunc("/api/event_types", middleware.Logging(handlers.GetEventTypes)).Methods("GET")
 	router.HandleFunc("/api/event_type/{id}", middleware.Logging(handlers.GetEventTypeByID)).Methods("GET")
+	router.HandleFunc("/api/event_type/{id}", middleware.Logging(handlers.PutEventTypeByID)).Methods("PUT")
 	router.HandleFunc("/api/event_type/{id}", middleware.Logging(handlers.DeleteEventType)).Methods("DELETE")
 
 	router.HandleFunc("/api/space_reservation", middleware.Logging(handlers.CreateSpaceReservation)).Methods("POST")

@@ -155,3 +155,27 @@ func DeleteUser(userID string) error {
 	_, err := DB.Exec(query, userID)
 	return err
 }
+
+func UpdateUser(userID string, user models.User) error {
+	query := `
+		UPDATE users
+		SET 
+			email = ?,
+			first_name = ?,
+			last_name = ?,
+			phone_number = ?,
+			profile_picture = ?
+		WHERE id = ?
+	`
+
+	_, err := DB.Exec(query,
+		user.Email,
+		user.FirstName,
+		user.LastName,
+		user.PhoneNumber,
+		user.ProfilePictureUrl,
+		userID,
+	)
+
+	return err
+}

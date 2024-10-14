@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -90,6 +91,42 @@ func DeleteEventType(w http.ResponseWriter, r *http.Request) {
 	if err := database.DeleteEventType(id); err != nil {
 		log.Errorf("Failed to delete event type: %v", err)
 		http.Error(w, "Failed to delete event type", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func PutEventTypeByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	if _, err := uuid.Parse(id); err != nil {
+		http.Error(w, "Invalid event type id", http.StatusBadRequest)
+		return
+	}
+
+	var eventType models.EventType
+	if err := json.NewDecoder(r.Body).Decode(&eventType); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := eventType.Validate(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := database.PutEventTypeByID(id, eventType); err != nil {
+		if sqlErr, ok := err.(*mysql.MySQLError); ok {
+			switch sqlErr.Number {
+			case 1062:
+				http.Error(w, "Event type with this name already exists", http.StatusConflict)
+				return
+			}
+		}
+		log.Errorf("Failed to update event type: %v", err)
+		http.Error(w, "Failed to update event type", http.StatusInternalServerError)
 		return
 	}
 

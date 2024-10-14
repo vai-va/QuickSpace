@@ -213,3 +213,33 @@ func GetSpacesByUserIDByEventType(userID string, eventTypeID string) ([]models.S
 
 	return spaces, nil
 }
+
+func UpdateSpaceByID(spaceID string, space models.Space) error {
+	query := `
+		UPDATE spaces
+		SET
+			name = ?,
+			location = ?,
+			capacity_from = ?,
+			capacity_to = ?,
+			price_per_hour = ?,
+			description = ?,
+			image_url = ?,
+			status = ?
+		WHERE id = ?
+	`
+
+	_, err := DB.Exec(query,
+		space.Name,
+		space.Location,
+		space.CapacityFrom,
+		space.CapacityTo,
+		space.PricePerHour,
+		space.Description,
+		space.ImageUrl,
+		space.Status,
+		spaceID,
+	)
+
+	return err
+}
