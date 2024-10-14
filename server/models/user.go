@@ -27,7 +27,15 @@ type User struct {
 	CognitoUserId     string    `json:"cognito_user_id"`
 }
 
-func (u *User) Validate() error {
+func (u *User) ValidatePost() error {
+	u.ValidatePut()
+	if err := validatePassword(u.Password); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *User) ValidatePut() error {
 	if err := validateEmail(u.Email); err != nil {
 		return err
 	}
@@ -38,9 +46,6 @@ func (u *User) Validate() error {
 		return err
 	}
 	if err := validatePhoneNumber(u.PhoneNumber); err != nil {
-		return err
-	}
-	if err := validatePassword(u.Password); err != nil {
 		return err
 	}
 	return nil

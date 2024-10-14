@@ -90,3 +90,21 @@ func DeleteEventType(id string) error {
 	_, err := DB.Exec(query, id)
 	return err
 }
+
+func PutEventTypeByID(id string, eventType models.EventType) error {
+	query := `
+		UPDATE event_types
+		SET
+			name = ?,
+			description = ?,
+			icon_url = ?
+		WHERE id = ?
+	`
+	_, err := DB.Exec(query,
+		eventType.Name,
+		eventType.Description,
+		eventType.IconUrl,
+		id,
+	)
+	return err
+}

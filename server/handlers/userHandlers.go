@@ -23,7 +23,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Validate the user input
-	if err := user.Validate(); err != nil {
+	if err := user.ValidatePost(); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -107,6 +107,35 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Errorf("Failed to delete user: %v", err)
 		http.Error(w, "Failed to delete user", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func PutUserByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idStr := vars["id"]
+
+	if _, err := uuid.Parse(idStr); err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Validate the user input
+	if err := user.ValidatePut(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := database.UpdateUser(idStr, user); err != nil {
+		log.Errorf("Failed to update user: %v", err)
+		http.Error(w, "Failed to update user", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
